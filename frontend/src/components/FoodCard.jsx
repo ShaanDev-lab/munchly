@@ -1,0 +1,129 @@
+import React, { useState } from "react";
+import { FaLeaf } from "react-icons/fa";
+import { FaDrumstickBite } from "react-icons/fa";
+import { FaStar } from "react-icons/fa";
+import { FaRegStar } from "react-icons/fa6";
+import { FaMinus } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
+import { FaShoppingCart } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import { addToCart } from "../redux/userSlice";
+
+function FoodCard({ data }) {
+  const [quantity, setQuantity] = useState(1);
+  const dispatch = useDispatch();
+
+  const { cartItems } = useSelector((state) => state.user);
+  const cartQty =
+    cartItems?.find((i) => String(i.id) === String(data?._id))?.quantity ?? 0;
+  const renderStars = (rating) => {
+    const stars = [];
+    const safeRating = Math.max(0, Math.min(5, Math.round(rating || 0)));
+    for (let i = 1; i <= 5; i++) {
+      stars.push(
+        i <= safeRating ? (
+          <FaStar key={i} className="text-yellow-500 text-lg" />
+        ) : (
+          <FaRegStar key={i} className="text-yellow-500 text-lg" />
+        ),
+      );
+    }
+    return stars;
+  };
+
+  const handleIncrease = () => {
+    setQuantity((q) => Math.min(q + 1, 99));
+  };
+
+  const handleDecrease = () => {
+    setQuantity((q) => Math.max(1, q - 1));
+  };
+
+  const handleAdd = () => {
+    if (!data?._id || quantity < 1) return;
+    dispatch(
+      addToCart({
+        id: data._id,
+        name: data.name,
+        price: data.price,
+        image: data.image,
+        shop: data.shop,
+        quantity,
+        foodType: data.foodType,
+      }),
+    );
+    setQuantity(1);
+  };
+
+  return (
+    <div className="w-[250px] rounded-2xl border-2 border-[#ff4d2d] bg-white shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col">
+      <div className="relative w-full h-[170px] flex justify-center items-center bg-white">
+        <div className="absolute top-3 right-3 bg-white rounded-full p-1 shadow">
+          {data?.foodType === "veg" ? (
+            <FaLeaf className="text-green-600 text-lg" />
+          ) : (
+            <FaDrumstickBite className="text-red-600 text-lg" />
+          )}
+        </div>
+
+        <img
+          src={data?.image}
+          alt={data?.name ?? "food"}
+          className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+        />
+      </div>
+
+      <div className="flex-1 flex flex-col p-4">
+        <h1 className="font-semibold text-gray-900 text-base truncate">
+          {data?.name}
+        </h1>
+
+        <div className="flex items-center gap-1 mt-1">
+          {renderStars(data?.rating?.average || 0)}
+          <span className="text-xs text-gray-500">
+            {data?.rating?.count || 0}
+          </span>
+        </div>
+        {cartQty > 0 && (
+          <span className="text-xs text-green-600 mt-1">
+            In cart: {cartQty}
+          </span>
+        )}
+      </div>
+
+      <div className="flex items-center justify-between mt-auto p-3">
+        <span className="font-bold text-gray-900 text-lg">₹{data?.price}</span>
+
+        <div className="flex items-center border rounded-full overflow-hidden shadow-sm">
+          <button
+            type="button"
+            aria-label="Decrease quantity"
+            className="px-2 py-1 hover:bg-gray-100 transition"
+            onClick={handleDecrease}
+          >
+            <FaMinus size={12} />
+          </button>
+          <span className="min-w-[20px] text-center">{quantity}</span>
+          <button
+            type="button"
+            aria-label="Increase quantity"
+            className="px-2 py-1 hover:bg-gray-100 transition"
+            onClick={handleIncrease}
+          >
+            <FaPlus size={12} />
+          </button>
+          <button
+            type="button"
+            aria-label="Add to cart"
+            className={`${cartQty > 0 ? "bg-gray-800" : "bg-[#ff4d2d]"} text-white px-3 py-2 transition-colors`}
+            onClick={handleAdd}
+          >
+            <FaShoppingCart size={16} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default FoodCard;

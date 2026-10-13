@@ -1,0 +1,7 @@
+{
+  "watch": ["index.js", "socket.js", "config", "controllers", "middlewares", "models", "routes", "utils"],
+  "ignore": ["public/*", "node_modules", ".env", "*.log"],
+  "ext": "js,json",
+  "legacyWatch": true,
+  "delay": 500
+}

@@ -1,0 +1,8 @@
+.env
+backend/node_modules/
+public/*.png
+public/*.jpg
+public/*.jpeg
+public/*.webp
+frontend/node_modules/
+!public/.gitkeep
